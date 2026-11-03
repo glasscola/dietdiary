@@ -12,3 +12,8 @@
 
 APK SHA-256:
 `d70f20a7a5de307b28fa8f5f14ae7eea8f0241b21560ac3fc1f1385b4055df63`
+
+
+## v0.2.0 (2026-11-03)
+
+40 model tests pass, including guaranteed operating income, furniture attribution, weekly counter double-claim/undo, distinct-day project progress, settlement idempotency and occurrence-only rest. Browser verified weekly target 3, first practice, operating estimate +141 G, project date contribution; mobile viewport 390px has no horizontal overflow. Same-package/same-key signed APK, versionCode 3. Android release build and lint checked. Physical phone install and long-running economy not tested. Earlier preview images show v0.1.1; use the current app for updated UI.

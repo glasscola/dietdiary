@@ -1,6 +1,6 @@
 {
   "name": "saebom-dietdiary",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "나의 몸, 나의 회사 — 포근한 픽셀 다이어트 다이어리",
   "scripts": {

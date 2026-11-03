@@ -30,3 +30,5 @@ input,select,textarea{background:#fff9ec;color:#5f442b;border-color:#d4bd97;font
 @media(max-width:720px){.shop-card{padding:10px}.shop-sprite{height:100px}.shop-sprite canvas{width:132px;height:91px}.manage-actions .small{font-size:10px}.phone{background:#f5efe5}.page-top h2{font-size:23px}}
 .stamp{width:124px;height:124px;padding:10px 7px;word-break:keep-all;font-size:13px;line-height:1.8}.stamp small{font-size:8px;letter-spacing:.6px}.stamp.pending{opacity:.85}
 .pixel-leaf{width:28px;height:28px;background:transparent url('icon.svg') center/contain no-repeat;clip-path:none;flex-shrink:0}.tiny-brand .pixel-leaf{width:23px;height:23px}
+
+.project-panel{margin:10px 18px;padding:18px;background:#fffaf1;border:1px solid #dfcfb5;border-radius:18px}.project-panel small,.work-link{display:block;font-size:10px;color:#806b52;line-height:1.7}.project-item{padding:12px 0;border-top:1px dashed #d9c7ac}.project-item b{font-size:12px}progress{width:100%;height:8px;accent-color:#83956a}.work-link{margin-top:5px}.project-panel .row{flex-wrap:wrap;gap:5px}

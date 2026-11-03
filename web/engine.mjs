@@ -64,7 +64,7 @@ export function setFurnitureSkin(s,uid,skin){const i=s.inventory.find(i=>i.uid==
 export function storeFurniture(s,uid){const i=s.inventory.find(i=>i.uid===uid);if(!i)throw Error('가구를 찾지 못했어요.');i.equipped=false;return i;}
 export function efficiencyBreakdown(s,floor,seat=null){const parts={seat:0,floor:0,company:0};for(const i of s.inventory){if(!i.equipped||i.floor==null)continue;const a=SHOP.find(a=>a.id===i.id),scope=furnitureScope(i);if(scope==='company'||i.floor===floor&&(scope==='floor'||seat!=null&&i.slot===seat))parts[scope]+=(a.efficiency||0)*i.level;}parts.seat=Math.min(.18,parts.seat);parts.floor=Math.min(.12,parts.floor);parts.company=Math.min(.08,parts.company);return {...parts,total:Math.min(.35,parts.seat+parts.floor+parts.company)};}
 export function exerciseGap(s,date=s.day){let gap=0;for(let i=0;i<30;i++){const d=addDays(date,-i);if(d<s.created)break;const a=activity(s,d),q=Object.values(s.questLog||{}).some(q=>q.completed&&q.date===d&&q.category==='exercise');if(a.exercise||a.walk||q)break;gap++;}return gap;}
-export function dayMood(s,date=s.day){const q=Object.values(s.questLog||{}).filter(q=>q.completed&&q.date===date),a=activity(s,date),rest=!!(a.rest||a.movie||q.some(q=>q.category==='rest')),active=!!(a.exercise||a.walk||q.some(q=>q.category==='exercise')),count=q.length+Object.values(a).filter(Boolean).length,gap=exerciseGap(s,date);return {rest,active,count,gap,kind:count>=7?'busy':active?'active':rest&&gap<3?'rest':gap>=3?'stalled':count?'steady':'quiet'};}
+export function dayMood(s,date=s.day){const q=Object.values(s.questLog||{}).filter(q=>q.completed&&q.date===date),a=activity(s,date),rest=!!(a.rest||a.movie||q.some(q=>q.category==='rest')),active=!!(a.exercise||a.walk||q.some(q=>q.category==='exercise')),count=q.length+Object.values(a).filter(Boolean).length,gap=exerciseGap(s,date);return {rest,active,count,gap,kind:count>=7?'busy':active?'active':rest?'rest':count===0?'quiet':gap>=3&&!rest?'stalled':count?'steady':'quiet'};}
 export function dailyWisdom(s,date=s.day){const m=dayMood(s,date),books={busy:['열심히 산 하루에도, 숨을 고를 자리는 필요해요.','많이 해낸 날에는 나를 쉬게 하는 일도 성과예요.','오늘의 최선 다음에는 편안한 쉼을 놓아주세요.'],active:['작은 한 걸음도, 어제와 다른 방향으로 나를 데려가요.','빠른 변화보다 오래 이어갈 수 있는 하루를 쌓아요.','내 속도로 움직인 오늘이 내일의 힘이 돼요.'],rest:['휴식도 나를 돌보는 방법이에요. 오늘은 편안하게 충전해요.','쉬어가는 하루가 있어야 다음 걸음도 가벼워져요.','잠시 멈춘 오늘도, 나를 위한 하루예요.'],stalled:['쉬는 날이 이어졌네요. 내일은 작은 산책부터 해볼까요?','내일은 딱 한 가지, 나를 위한 작은 약속을 골라봐요.','다시 시작하는 데 큰 결심은 필요 없어요. 한 걸음이면 충분해요.'],steady:['오늘 지킨 작은 약속은 사라지지 않고 내 안에 남아요.','꾸준함은 매일 완벽한 모습보다, 다시 돌아오는 마음이에요.','남과 다른 속도도 나에게는 맞는 속도일 수 있어요.'],quiet:['오늘은 조용히 지나갔네요. 내일의 작은 시작을 기다릴게요.','아무것도 못 한 날에도, 나를 다그치지 않아도 괜찮아요.','내일은 물 한 잔과 작은 기록 하나로 시작해볼까요?']};return {kind:m.kind,text:books[m.kind][hash(s.seed+date+'wisdom')%books[m.kind].length],source:'새봄의 하루 문장'};}
 export function innerThought(s,e,date=s.day){const m=dayMood(s,date),lines={busy:['오늘 일정이 꽉 찼네. 조금 힘들다…','우리 대표님도 잠깐 쉬면 좋겠어.','바쁜 날엔 이 커피 한 잔이 소중해.'],active:['오늘은 우리도 할 일이 있네!','움직이는 날은 회사도 활기차.','작은 운동 하나에도 힘이 나네.'],rest:['오늘은 같이 숨 좀 돌리자.','잘 쉬어야 오래 일할 수 있지.','오늘 쉼이 내일 힘이 되면 좋겠어.'],stalled:['운동을 며칠 쉬니 할 일이 없네…','내일은 가볍게 움직여주실까?','대표님의 작은 시작을 기다리는 중.'],steady:['작은 약속이 하나씩 쌓이고 있어.','이 정도 페이스도 꽤 괜찮은데?','내 자리에서 천천히 해볼게.'],quiet:['오늘은 사무실이 조용하네.','대표님, 작은 일 하나 해볼까요?','내일은 무슨 일을 하게 될까?']};return lines[m.kind][hash(e.id+date)%lines[m.kind].length];}
 
@@ -77,7 +77,7 @@ export function migrateState(s){
   {id:'starter-rest',title:'나를 위한 휴식 시간',type:'daily',difficulty:'easy',category:'rest',repeat:'weekdays',days:[0,1,2,3,4,5,6],startDate:s.created||s.day},
   {id:'starter-week',title:'이번 주 운동 세 번 해보기',type:'weekly',difficulty:'normal',category:'exercise',repeat:'weekly',days:[],startDate:s.created||s.day},
   {id:'starter-movie',title:'영화 한 편 보며 쉬어가기',type:'weekly',difficulty:'easy',category:'rest',repeat:'weekly',days:[],startDate:s.created||s.day}
- ];s.questLog??={};s.stamps??={};const previousRevision=s.revision||1;s.revision=3;
+ ];s.questLog??={};s.stamps??={};const previousRevision=s.revision||1;s.revision=4;s.weeklyProgress??={};s.pausedDays??={};
  for(const i of s.inventory){i.level??=1;i.skin??=1;i.slot??=0;i.equipped??=true;if(previousRevision<3&&['pantry','coffee','water'].includes(i.id))i.floor=6;if(i.floor==null)i.equipped=false;if(!SHOP.find(a=>a.id===i.id)?.allowedFloors.includes(i.floor)){i.equipped=false;i.floor=null;}}
  for(const f of [2,3,4]){const used=new Set();for(const e of s.staff.filter(e=>e.floor===f)){if(!Number.isInteger(e.seat)||e.seat<0||e.seat>2||used.has(e.seat))e.seat=[0,1,2].find(i=>!used.has(i));used.add(e.seat);}}
  for(const e of s.staff){e.hair??=hash(e.id+'hair')%5;e.outfit??=hash(e.id+'outfit')%6;e.accessory??=hash(e.id+'acc')%4;}
@@ -86,6 +86,7 @@ export function migrateState(s){
 export function questKey(q,date){return q.id+':'+(q.type==='weekly'?weekStart(date):date);}
 export function scheduledQuests(s,type,date=s.day){return (s.customQuests||[]).filter(q=>{
  if(q.type!==type||q.startDate>date||(q.deletedOn&&q.deletedOn<=date))return false;
+ if(s.pausedDays?.[q.id+':'+date])return false;
  if(type==='weekly')return q.repeat==='weekly'||weekStart(q.startDate)===weekStart(date);
  return q.repeat==='once'?q.startDate===date:q.days.includes(new Date(date+'T12:00:00Z').getUTCDay());
  }).map(q=>({...q,key:questKey(q,date),log:s.questLog[questKey(q,date)]||null}));}
@@ -95,13 +96,15 @@ export function upsertQuest(s,input){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(input.startDate))throw Error('시작 날짜를 선택해주세요.');
  const days=[...new Set((input.days||[]).map(Number))].filter(n=>n>=0&&n<=6);
  if(input.type==='daily'&&input.repeat!=='once'&&!days.length)throw Error('반복할 요일을 하나 이상 선택해주세요.');
- let old=s.customQuests.find(q=>q.id===input.id);const q={id:old?.id||'quest-'+(++s.serial),title,type:input.type,difficulty:input.difficulty,category:input.category,repeat:input.type==='weekly'?(input.repeat==='once'?'once':'weekly'):(input.repeat==='once'?'once':'weekdays'),days,startDate:input.startDate};
+ let old=s.customQuests.find(q=>q.id===input.id);const q={id:old?.id||'quest-'+(++s.serial),title,type:input.type,difficulty:input.difficulty,category:input.category,repeat:input.type==='weekly'?(input.repeat==='once'?'once':'weekly'):(input.repeat==='once'?'once':'weekdays'),days,startDate:input.startDate,target:input.type==='weekly'?Math.max(1,Math.min(30,Math.round(Number(input.target)||1))):1};
  if(old)Object.assign(old,q);else s.customQuests.push(q);return q;
 }
 export function deleteQuest(s,id){const q=s.customQuests.find(q=>q.id===id);if(!q)throw Error('일정을 찾지 못했어요.');q.deletedOn=s.day;}
 export function toggleQuest(s,id,date=s.day){
  const q=s.customQuests.find(q=>q.id===id);if(!q)throw Error('일정을 찾지 못했어요.');const key=questKey(q,date),prior=s.questLog[key];
- if(prior?.completed){prior.completed=false;transaction(s,'완료 취소: '+prior.title,-prior.amount,date);delete s.stamps[date];delete s.stamps[prior.date];return {...prior,cancelled:true};}
+ if(q.type==='weekly'&&(q.target||1)>1&&!prior?.completed){const list=s.weeklyProgress??={};const entries=list[key]??=[];if(entries.includes(date))throw Error('오늘 실천은 이미 기록했어요.');entries.push(date);if(entries.length<q.target)return {partial:true,count:entries.length,target:q.target};}
+ if(prior?.completed&&s.ledger.some(l=>l.date===prior.date))throw Error('결산된 실천은 취소할 수 없어요.');
+ if(prior?.completed){if(s.weeklyProgress?.[key])s.weeklyProgress[key].pop();prior.completed=false;transaction(s,'완료 취소: '+prior.title,-prior.amount,date);delete s.stamps[date];delete s.stamps[prior.date];return {...prior,cancelled:true};}
  if(!scheduledQuests(s,q.type,date).some(a=>a.id===id))throw Error('이 날짜에 예정된 일정이 아니에요.');
  const dice=prior?.dice||1+hash(s.seed+key+'dice')%6,base=prior?.base||DIFFICULTIES[q.difficulty][q.type],amount=prior?.amount||Math.round(base*(1+dice/10));
  const log={key,id,title:prior?.title||q.title,type:q.type,category:q.category,difficulty:q.difficulty,dice,base,amount,completed:true,date};s.questLog[key]=log;transaction(s,'일정 완료: '+log.title,amount,date);delete s.stamps[date];return log;
@@ -192,7 +195,7 @@ export function settle(s,date=s.day){
  const wages=s.staff.reduce((sum,e)=>sum+WAGES[e.star],0);if(wages)transaction(s,'직원 월급',-wages,date);
  let performance=0;
  for(const e of [...s.staff]){
-  const work=effort(s,date),a=activity(s,date);let matching=e.floor===2?Number(!!a.exercise)+Number(!!a.walk):e.floor===3?Number(s.records[date]?.calories!=null):Number(!!a.rest)+Number(s.records[date]?.sleep!=null);
+  const work=effort(s,date)+Math.min(1,Object.values(s.weeklyProgress||{}).filter(ds=>ds.includes(date)).length*.6),a=activity(s,date);let matching=e.floor===2?Number(!!a.exercise)+Number(!!a.walk):e.floor===3?Number(s.records[date]?.calories!=null):Number(!!a.rest)+Number(s.records[date]?.sleep!=null);
   const completed=Object.values(s.questLog||{}).filter(q=>q.completed&&q.date===date);matching+=completed.filter(q=>q.category===(e.floor===2?'exercise':e.floor===3?'diet':'rest')).length;
   const boost=e.trait===0&&s.records[date]?1:e.trait===1&&a.habit?1:e.trait===2&&a.exercise?1:e.trait===3&&a.rest?1:e.trait===4&&a.walk?1:0;
   e.tenure++;e.cycle++;
@@ -201,13 +204,14 @@ export function settle(s,date=s.day){
   if(e.strain>=3){e.morale=Math.max(5,e.morale-4);if(e.strain<5)events.push(e.name+' 님이 회사의 앞날을 걱정합니다.');}
   if(e.strain>=5&&rnd(e.id+date+'leave')<.28){s.staff=s.staff.filter(x=>x.id!==e.id);events.push(e.name+' 님이 다른 회사를 찾아 떠났습니다.');continue;}
   if(e.strain>=4&&e.star>1&&e.cycle>=2){e.star--;e.stats=e.stats.map(v=>Math.max(3,Math.floor(v*.85)));e.cycle=0;events.push(e.name+' 님이 '+e.star+'성으로 강등되었습니다.');}
-  else if(e.cycle>=3&&e.star<5){e.star++;e.cycle=0;const growth=work>0?Math.round((1+matching+boost)*(.6+rnd(e.id+date))):0;e.stats=e.stats.map((v,j)=>v+Math.round(growth*(.5+rnd(e.id+j))));events.push(e.name+' 님이 '+e.star+'성으로 승진했습니다.');}
+  else if(e.cycle>=3&&e.star<5){e.star++;e.cycle=0;const growth=work>0?Math.round((1+matching+boost)*(.6+rnd(e.id+date))):0;e.stats=e.stats.map((v,j)=>v+Math.round(growth*(.5+rnd(e.id+j))*(j===0?1+Math.min(.3,e.stats[0]/300):1)));events.push(e.name+' 님이 '+e.star+'성으로 승진했습니다.');}
   if(work>0){const j=hash(e.id+date)%4;e.stats[j]+=Math.round((work+matching+boost)*(.5+rnd(date+e.id+'growth')));}
-  if(work>0&&rnd(e.id+date+'bonus')<Math.min(.8,.06+e.stats[1]/450+e.stats[3]/700+efficiencyBonus(s,e.floor,e.seat))){const amount=12+e.star*7+Math.floor(e.stats.reduce((a,v)=>a+v,0)/24);performance+=amount;events.push(e.name+' 님의 업무 성과 +'+amount+' G');}
+
  }
- if(performance)transaction(s,'직원 업무 성과',performance,date);
+ // Operating income is deterministic and itemized below.
  const questSnapshot=receiptQuests(s,date).map(q=>({id:q.id,key:q.key,title:q.title,type:q.type,difficulty:q.difficulty}));
- const report={date,roll,value,dividend:pay,wages,performance,events,balance:s.gold,profile:{...s.profile},questSnapshot,activities:{...activity(s,date)}};s.ledger.push(report);s.ledger.sort((a,b)=>a.date.localeCompare(b.date));s.lastClosed=date;return report;
+ const operations=operationsPreview(s,date);performance=operations.total;if(performance)transaction(s,'확정 운영 수익',performance,date);for(const row of operations.rows){const person=s.staff.find(e=>e.id===row.id);if(person){person.lastWork={date,...row};events.push(person.name+' · '+row.units+'건 처리 +'+row.total+' G (가구 +'+row.furniture+' G)');}}
+ const report={operations,date,roll,value,dividend:pay,wages,performance,events,balance:s.gold,profile:{...s.profile},questSnapshot,activities:{...activity(s,date)}};s.ledger.push(report);s.ledger.sort((a,b)=>a.date.localeCompare(b.date));s.lastClosed=date;return report;
 }
 export function advance(s){const report=settle(s,s.day);s.day=addDays(s.day,1);return report;}
 export function catchUp(s,now=new Date()){if(!s.profile)return 0;const closed=lastClosedDate(s.profile.closeTime,now);let n=0;while(s.day<=closed&&n<400){advance(s);n++;}return n;}
@@ -219,3 +223,9 @@ export function makeDemo(day=seoulDate()){
  for(const [n,id,floor,slot,level]of [[7,'parasol',6,0,2],[8,'teatable',6,0,2],[9,'flowerbox',6,0,2],[10,'rattan',2,0,3],[11,'mug',2,0,3],[12,'keyboard',2,0,2],[13,'deskplant',3,1,2]])s.inventory.push({uid:'demo-i'+n,id,floor,slot,level,skin:level,paid:SHOP.find(a=>a.id===id).price,equipped:true});
  for(let i=1;i<=6;i++){const date=addDays(day,-i);for(const q of scheduledQuests(s,'daily',date).slice(0,i%3+1)){const key=questKey(q,date),base=DIFFICULTIES[q.difficulty].daily,dice=hash(key)%6+1;s.questLog[key]={key,id:q.id,title:q.title,type:q.type,category:q.category,difficulty:q.difficulty,dice,base,amount:Math.round(base*(1+dice/10)),completed:true,date};}}return migrateState(s);
 }
+
+export function undoWeekly(s,id){const q=s.customQuests.find(q=>q.id===id);if(!q)throw Error('일정을 찾지 못했어요.');const key=questKey(q,s.day);if(s.questLog[key]?.completed)return toggleQuest(s,id);const entries=s.weeklyProgress?.[key];if(entries?.length){if(s.ledger.some(l=>l.date===entries.at(-1)))throw Error('결산된 실천은 취소할 수 없어요.');entries.pop();}}
+export function pauseToday(s,id){s.pausedDays??={};s.pausedDays[id+':'+s.day]=true;}
+export function workSignals(s,date=s.day){const counts={exercise:0,diet:0,rest:0,habit:0,general:0};for(const q of Object.values(s.questLog||{}))if(q.completed&&q.date===date&&!s.weeklyProgress?.[q.key])counts[q.category]=(counts[q.category]||0)+1;for(const [key,entries]of Object.entries(s.weeklyProgress||{})){const q=s.customQuests.find(q=>key.startsWith(q.id+':'));if(q)counts[q.category]=(counts[q.category]||0)+entries.filter(d=>d===date).length;}const a=activity(s,date);counts.exercise+=Number(!!a.exercise)+Number(!!a.walk);counts.rest+=Number(!!a.rest)+Number(!!a.movie);counts.habit+=Number(!!a.habit);counts.diet+=Number(s.records[date]?.calories!=null);return counts;}
+export function operationsPreview(s,date=s.day){const signals=workSignals(s,date);const rows=s.staff.map(e=>{const category=e.floor===2?'exercise':e.floor===3?'diet':'rest',units=Math.min(3,signals[category]+Math.min(1,signals.habit)),team=s.staff.filter(p=>p.floor===e.floor),collab=Math.min(.15,team.reduce((v,p)=>v+p.stats[2],0)/1500),base=Math.round(units*(16+e.star*8+e.stats[1]/12)*(1+collab)),furniture=units?Math.ceil(base*efficiencyBonus(s,e.floor,e.seat)):0;return {id:e.id,name:e.name,units,base,furniture,total:base+furniture,category};});return {rows,total:rows.reduce((v,r)=>v+r.total,0),furniture:rows.reduce((v,r)=>v+r.furniture,0)};}
+export function projectBook(s){return [ ['exercise','우리 동네 산책 지도','발자국 액자'],['diet','나를 위한 식탁','작은 식탁 배지'],['rest','편안한 쉼 연구','달빛 기념패'] ].map(([category,title,souvenir])=>{const entries=[];for(const [date]of Object.entries(s.records))entries.push(date);for(const q of Object.values(s.questLog||{}))entries.push(q.date);for(const dates of Object.values(s.weeklyProgress||{}))entries.push(...dates);for(const date of Object.keys(s.activities||{}))entries.push(date);const dates=[...new Set(entries)].sort().filter(d=>workSignals(s,d)[category]>0);const staff=s.staff.filter(e=>(e.floor===2?'exercise':e.floor===3?'diet':'rest')===category);const research=staff.length?Math.min(1,Math.floor(staff.reduce((v,e)=>v+e.stats[3],0)/200)):0;const target=5-research;return {category,title,souvenir,dates,target,count:dates.length,completed:Math.floor(dates.length/target),progress:dates.length%target};});}
