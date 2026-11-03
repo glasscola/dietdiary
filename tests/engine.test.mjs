@@ -32,10 +32,10 @@ test('goal change affects future settlement; correction uses original day goal',
 });
 test('time promotes without habits; no invented ability growth',()=>{
  const s=fresh();E.hire(s,E.candidates(s)[0],2);const e=s.staff[0];e.star=1;const stats=[...e.stats];for(let i=0;i<3;i++)E.advance(s);
- assert.equal(e.star,2);assert.deepEqual(e.stats,stats);assert.equal(s.staff.length,1);assert.ok(e.strain>=3);
+ assert.equal(e.star,2);assert.deepEqual(e.stats,stats);assert.equal(s.staff.length,1);assert.equal(e.strain,0);
 });
 test('active habits grow skills; demoted employee can return to 5 stars',()=>{
- const s=fresh();E.hire(s,E.candidates(s)[0],2);const e=s.staff[0];e.star=5;e.cycle=2;e.strain=3.5;e.stats=[100,100,100,100];E.advance(s);
+ const s=fresh();E.hire(s,E.candidates(s)[0],2);const e=s.staff[0];e.star=5;e.cycle=2;e.strain=3.5;e.stats=[100,100,100,100];s.journal[s.day]={note:"오늘은 활동하지 않음"};E.advance(s);
  assert.equal(e.star,4);assert.ok(e.stats.every(v=>v<100));for(let i=0;i<3;i++){E.setActivity(s,'exercise',true);E.setActivity(s,'habit',true);E.advance(s);}
  assert.equal(e.star,5);assert.ok(e.stats.some(v=>v>85));assert.ok(e.strain<3);
 });

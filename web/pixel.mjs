@@ -1,4 +1,4 @@
-import {FLOORS,SHOP,hash,innerThought,workSignals,projectBook} from './engine.mjs';
+import {FLOORS,SHOP,hash,innerThought,workSignals,projectBook,dialogue,roleOf} from './engine.mjs';
 export const CANVAS_W=480;
 export const CANVAS_H=1000;
 const FY={1:778,2:638,3:498,4:358,5:218,6:46},LIFT_X=440;
@@ -15,7 +15,7 @@ function nameTag(c,t,x,y){const w=t.length*8+14;rounded(c,x-w/2,y,w,16,5,'#fff8e
 function avatar(c,e,x,y,t=0,pose={}){
  const skin=SKIN[(e.skin??hash(e.id+'skin'))%6],hair=HAIR[(e.hair??hash(e.id+'hair'))%7],col=CLOTH[(e.outfit??hash(e.id+'outfit'))%8],style=(e.outfit??0)%4,hs=(e.hair??0)%7,acc=(e.accessory??0)%5;
  const walking=pose.walking,step=walking?Math.sin(t*11+(hash(e.id)%6))*2:0,bob=walking?Math.abs(Math.sin(t*11))*.8:Math.sin(t*1.7+hash(e.id)%7)*.35;
- c.save();c.translate(Math.round(x),Math.round(y+bob));if(pose.walking&&pose.direction===-1)c.scale(-1,1);shade(c,0,37,12,2.5);
+ c.save();c.translate(Math.round(x),Math.round(y+bob));if(pose.walking&&pose.direction===-1)c.scale(-1,1);if(pose.seated&&pose.working&&roleOf(e)==='researcher'){rect(c,15,25,12,8,'#f8edcf');rect(c,17,28,7,1,'#a08259');}shade(c,0,37,12,2.5);
  if(hs===2||hs===4)rounded(c,-14,-4,28,29,7,hair);
  if(pose.seated){rounded(c,-9,25,19,6,3,'#7d7468');rect(c,-8,29,5,22,'#7d7468');rect(c,4,29,5,22,'#7d7468')}
  else{rounded(c,-8,25+step,6,10,2,'#7a7365');rounded(c,3,25-step,6,10,2,'#7a7365')}
@@ -118,7 +118,7 @@ export function sceneHit(x,y){return [...targets].reverse().find(a=>x>=a.x&&x<=a
 export function renderBuilding(canvas,s,time=0){
  if(canvas.width!==CANVAS_W||canvas.height!==CANVAS_H){canvas.width=CANVAS_W;canvas.height=CANVAS_H}const c=canvas.getContext('2d');clockNow=new Date();c.imageSmoothingEnabled=false;targets=[];rect(c,0,0,480,1000,'#e9dfce');
  for(let i=0;i<5;i++){const x=(i*137+time*.9)%600-40;rounded(c,x,12+i%2*20,72,7,4,'#f7efe0');rounded(c,x+16,6+i%2*20,32,10,5,'#f7efe0')}
- const night=clockNow.getHours()<6||clockNow.getHours()>=19;if(night)rect(c,0,0,480,207,'#555660');for(const [idx,p]of projectBook(s).entries())if(p.completed){rounded(c,45+idx*42,73,28,28,3,'#ead7ad');text(c,['歩','食','月'][idx],59+idx*42,92,12,'#947047','center');}
+ const night=clockNow.getHours()<6||clockNow.getHours()>=19;if(night)rect(c,0,0,480,207,'#555660');
  text(c,(s.profile?.name||'새봄')+' COMPANY',240,27,11,'#7d644c','center');
  rect(c,21,208,441,751,'#aa8862');rect(c,28,208,385,747,'#eadcc3');
  // Rooftop cafe is physically separated from the interview floor.
@@ -127,6 +127,7 @@ export function renderBuilding(canvas,s,time=0){
  const rug=active(s,6,'rug');if(rug)furnitureArt(c,rug,206,157,1.2);const para=active(s,6,'parasol');if(para)furnitureArt(c,para,321,102,.65);
  furnitureArt(c,active(s,6,'sofa')||{id:'pantry',skin:1},203,150,.93);furnitureArt(c,active(s,6,'coffee')||{id:'coffee',skin:1},65,129,.65);furnitureArt(c,active(s,6,'water')||{id:'water',skin:1},379,126,.58);
  const roofSpots={plant:[345,150,.65],lamp:[122,137,.6],beanbag:[300,160,.6],teatable:[202,172,.58],flowerbox:[62,177,.6],hammock:[317,143,.7],speaker:[104,102,.4]};for(const [kind,[x,y,sc]]of Object.entries(roofSpots)){const i=active(s,6,kind);if(i)furnitureArt(c,i,x,y,sc)}
+for(const [idx,p]of projectBook(s).entries())if(p.completed){rounded(c,45+idx*42,73,28,28,3,'#ead7ad');text(c,['歩','食','月'][idx],59+idx*42,92,12,'#947047','center');}
  targets.push({action:'lounge',x:30,y:50,w:384,h:142});
  for(const f of [5,4,3,2]){const y=FY[f],wall=active(s,f,'wallpaper'),wallCol=wall?warmColor(SHOP.find(a=>a.id===wall.id)):'#f1e6d1';rect(c,28,y,385,96,wallCol);rect(c,28,y+96,385,34,'#d6b68b');for(let i=0;i<13;i++)rect(c,30+i*30,y+99,1,30,'#bd976d5f');rect(c,25,y+130,392,10,'#a17e57');rect(c,25,y+130,392,3,'#f5e6cc');
   if(wall&&wall.skin>=2)for(let xx=36;xx<410;xx+=22)rect(c,xx,y+3,wall.skin>=3?2:1,90,'#fff3dd70');
@@ -151,6 +152,6 @@ export function renderBuilding(canvas,s,time=0){
  // Door leaves cover riders during closed travel, so no one crosses floors in open air.
  const doorW=17*(1-scene.door);rect(c,422,cy-17,doorW,57,'#c5ad8b');rect(c,457-doorW,cy-17,doorW,57,'#c5ad8b');rect(c,439,cy-16,1,55,'#b69d7c');
  for(const p of scene.poses){if(p.zone==='elevator')continue;targets.push({action:'staff',id:p.id,x:p.x-20,y:p.y-17,w:40,h:57})}
- const resting=scene.poses.filter(p=>p.zone==='roof');if(resting.length>=2){const turn=Math.floor((scene.t-scene.restStart)/4)%resting.length,p=resting[turn],e=s.staff.find(e=>e.id===p.id);bubble(c,innerThought(s,e).slice(0,Math.max(1,Math.floor(((scene.t-scene.restStart)%4)*18))),p.x,p.y-17)}
+ const resting=scene.poses.filter(p=>p.zone==='roof');if(resting.length>=2){const turn=Math.floor((scene.t-scene.restStart)/4)%resting.length,p=resting[turn],e=s.staff.find(e=>e.id===p.id);const partner=s.staff.find(e=>e.id===resting[(turn+1)%resting.length].id),lines=dialogue(s,s.staff.find(e=>e.id===resting[0].id),s.staff.find(e=>e.id===resting[1].id)),line=lines[Math.floor((scene.t-scene.restStart)/4)%lines.length];bubble(c,line.name+': '+line.text,p.x,p.y-17)}
  rect(c,17,953,449,8,'#92704d');rect(c,12,961,459,8,'#c2a47b');rect(c,0,970,480,30,'#e0d0b8');for(let i=0;i<8;i++)rect(c,18+i*62,983,38,3,'#cbb28d');
 }
