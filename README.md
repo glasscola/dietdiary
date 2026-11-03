@@ -6,7 +6,7 @@
 
 ## Android 설치
 
-[Android APK 다운로드](https://github.com/glasscola/dietdiary/releases/download/v0.3.0/saebom-dietdiary-v0.3.0.apk) · [배포 안내](https://github.com/glasscola/dietdiary/releases/tag/v0.3.0)
+[Android APK 다운로드](https://github.com/glasscola/dietdiary/releases/download/v0.4.0/saebom-dietdiary-v0.4.0.apk) · [배포 안내](https://github.com/glasscola/dietdiary/releases/tag/v0.4.0)
 
 휴대폰 브라우저에서 APK를 내려받은 뒤, **내 파일 → 다운로드**에서 파일을 눌러 설치합니다. GitHub 로그인 없이 다운로드할 수 있습니다.
 
@@ -96,3 +96,9 @@ cd android
 - 새 가구·프로젝트 기억·휴식·역할·동료 문답 대화, 옥상 장식 가림 수정.
 
 이 버전은 기능 구조 개편입니다. 직원 일러스트 전체 교체, 자유 공간 편집, 관계별 장편 이야기, 월간 달력 그리드와 알림은 포함하지 않습니다. 현재 이동은 기존 엘리베이터 경로를 유지합니다. 기존 앱 삭제 없이 업데이트하고, 먼저 JSON 백업을 저장하세요.
+
+## 0.4.0 아트 업데이트
+
+`web/art.mjs`에서 직원과 31종 가구의 1~5레벨 외형을 새로 그립니다. 가디건·니트·셔츠·멜빵·정장, 헤어 실루엣·안경·핀·귀걸이, 원목 결·직물 봉제·쿠션·노트북 힌지/키보드·기기별 프레임·아날로그 눈금/디지털 시계·커피 머신·라탄 구조를 구체화했습니다. 건물에는 목재 바닥 이음새·벽 패널·창틀/커튼·옥상 조명·엘리베이터 표시를 반영했습니다.
+
+건물·초상·가구 캔버스는 두 배 해상도로 렌더링하며 부드러운 크기 조절을 적용합니다. 기존 직원의 외관 식별값, 보유 가구 레벨·스킨·기록은 유지합니다. 새로운 런타임 의존성이나 외부 이미지 다운로드는 없습니다.

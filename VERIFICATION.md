@@ -21,3 +21,7 @@ APK SHA-256:
 
 ## v0.3.0 (2026-11-03)
 45 tests pass. New coverage: finite job allocation, role/morale effects, explicit rest and partial weekly activity, closed-record income correction with original operating context, permanent project awards. Browser verified standalone journal without weight, planned-rest save and weekly review. Same signer, package and offline model; Android versionCode 4. Physical phone installation and long-term economy remain unverified. No new external services.
+
+
+## v0.4.0 (2026-11-03)
+45 existing behavior tests passed. Browser visual review covered 31 furniture types x 5 levels plus 10 employee appearances (165 canvases), with no console errors. Actual company verified at 390px mobile width, document width 390px, building canvas 960px. Artwork is shared across company, hiring, staff portraits and furniture catalog. Android release build/lint and same-key signature are checked during packaging. Physical phone performance remains unverified.

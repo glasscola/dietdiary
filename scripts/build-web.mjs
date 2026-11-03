@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const web=path.join(root,'web');
-const files=['index.html','app.mjs','engine.mjs','pixel.mjs','styles.css','icon.svg','icon-192.png','icon-512.png','privacy.html'];
+const files=['index.html','app.mjs','engine.mjs','pixel.mjs','art.mjs','styles.css','icon.svg','icon-192.png','icon-512.png','privacy.html'];
 for(const folder of ['dist','android/app/src/main/assets/www']){
   const target=path.join(root,folder);
   await fs.mkdir(target,{recursive:true});
