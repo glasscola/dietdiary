@@ -1,5 +1,5 @@
 import {drawPerson,drawFurnishing} from './art.mjs';
-import {FLOORS,SHOP,hash,innerThought,workSignals,projectBook,dialogue,roleOf} from './engine.mjs';
+import {FLOORS,SHOP,hash,innerThought,workSignals,projectBook,dialogue,roleOf,workThought} from './engine.mjs';
 export const CANVAS_W=480;
 export const CANVAS_H=1000;
 const FY={1:778,2:638,3:498,4:358,5:218,6:46},LIFT_X=440;
@@ -24,7 +24,7 @@ function deskPosition(e){return {x:85+(e.seat||0)*120,y:FY[e.floor]+56}}
 function liftY(f){return FY[f]+88}
 export function movementScene(s,time=0){
  time=Math.max(0,Number.isFinite(time)?time:0);
- const cycle=Math.floor(time/90),t=time%90,groups=[2,3,4].map(f=>s.staff.filter(e=>e.floor===f)),viable=groups.filter(g=>g.length>=2),pool=viable.length?viable[cycle%viable.length]:s.staff,offset=pool.length?cycle%pool.length:0,pair=pool.length>=2?[pool[offset],pool[(offset+1)%pool.length]]:pool.slice(0,1);
+ const period=s.journal?.[s.day]?.rest?75:105,cycle=Math.floor(time/period),t=time%period,groups=[2,3,4].map(f=>s.staff.filter(e=>e.floor===f)),viable=groups.filter(g=>g.length>=2),pool=viable.length?viable[cycle%viable.length]:s.staff,offset=pool.length?cycle%pool.length:0,pair=pool.length>=2?[pool[offset],pool[(offset+1)%pool.length]]:pool.slice(0,1);
  const origins=[...new Set(pair.map(e=>e.floor))].sort((a,b)=>a-b),stops=[],pick={},drop={};let cursor=12,from=1;
  function travel(to){const duration=Math.max(1,Math.abs(liftY(from)-liftY(to))/140*1.25);stops.push({start:cursor,end:cursor+duration,from,to,door:false});cursor+=duration;from=to}
  function hold(f){const stop={start:cursor,end:cursor+2,from:f,to:f,door:true};stops.push(stop);cursor+=2;return stop}
@@ -90,5 +90,6 @@ for(const [idx,p]of projectBook(s).entries())if(p.completed){rounded(c,45+idx*42
  const doorW=17*(1-scene.door);rect(c,422,cy-17,doorW,57,'#c5ad8b');rect(c,457-doorW,cy-17,doorW,57,'#c5ad8b');rect(c,439,cy-16,1,55,'#b69d7c');
  for(const p of scene.poses){if(p.zone==='elevator')continue;targets.push({action:'staff',id:p.id,x:p.x-20,y:p.y-17,w:40,h:57})}
  const resting=scene.poses.filter(p=>p.zone==='roof');if(resting.length>=2){const turn=Math.floor((scene.t-scene.restStart)/4)%resting.length,p=resting[turn],e=s.staff.find(e=>e.id===p.id);const partner=s.staff.find(e=>e.id===resting[(turn+1)%resting.length].id),lines=dialogue(s,s.staff.find(e=>e.id===resting[0].id),s.staff.find(e=>e.id===resting[1].id)),line=lines[Math.floor((scene.t-scene.restStart)/4)%lines.length];bubble(c,line.name+': '+line.text,p.x,p.y-17)}
+ const thoughtBeat=Math.floor(time/13),speaker=scene.poses.filter(p=>p.zone==='work');if(time%13<4&&speaker.length){const p=speaker[thoughtBeat%speaker.length],e=s.staff.find(e=>e.id===p.id);bubble(c,workThought(s,e,thoughtBeat),p.x,p.y-12);}
  rect(c,17,953,449,8,'#92704d');rect(c,12,961,459,8,'#c2a47b');rect(c,0,970,480,30,'#e0d0b8');for(let i=0;i<8;i++)rect(c,18+i*62,983,38,3,'#cbb28d');
 }

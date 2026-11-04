@@ -25,3 +25,10 @@ APK SHA-256:
 
 ## v0.4.0 (2026-11-03)
 45 existing behavior tests passed. Browser visual review covered 31 furniture types x 5 levels plus 10 employee appearances (165 canvases), with no console errors. Actual company verified at 390px mobile width, document width 390px, building canvas 960px. Artwork is shared across company, hiring, staff portraits and furniture catalog. Android release build/lint and same-key signature are checked during packaging. Physical phone performance remains unverified.
+
+
+## v0.5.0
+
+- 53 model tests: cooperative work, research/furniture effects, journal migration, alternative reward undo, project outputs, promotion approval, old accounting and movement continuity.
+- 390x844 browser flow: quick task, complete/undo, alternative, journal to receipt, staff/shop views. No page errors or horizontal overflow.
+- Android native CSV export accepts text/csv; JSON backup validation retained. Native picker and device performance still require physical-device testing.

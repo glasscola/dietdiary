@@ -111,13 +111,14 @@ public final class MainActivity extends Activity {
     public final class BackupBridge {
         @JavascriptInterface public void saveBackup(String json,String filename){
             if(json==null||json.length()>8_000_000)return;
-            try{new JSONObject(json);}catch(Exception e){return;}
+            final boolean csv=filename!=null&&filename.endsWith(".csv");
+            if(!csv){try{new JSONObject(json);}catch(Exception e){return;}}
             runOnUiThread(()->{
                 if(pendingBackup!=null){Toast.makeText(MainActivity.this,"진행 중인 저장을 먼저 마쳐주세요.",Toast.LENGTH_SHORT).show();return;}
                 pendingBackup=json;
                 Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("application/json");
+                intent.setType(csv?"text/csv":"application/json");
                 String safe=filename==null?"새봄-백업.json":filename.replaceAll("[\\\\/:*?\"<>|]","_");
                 intent.putExtra(Intent.EXTRA_TITLE,safe.substring(0,Math.min(100,safe.length())));
                 try{startActivityForResult(intent,EXPORT_FILE);}catch(Exception e){pendingBackup=null;Toast.makeText(MainActivity.this,"파일 저장창을 열지 못했어요.",Toast.LENGTH_LONG).show();}
